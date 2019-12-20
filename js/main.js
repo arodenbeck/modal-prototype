@@ -4,20 +4,19 @@ const ariaAnnouncement = document.getElementById('event-announcement')
 const modalButton = document.getElementById('jsModalButton')
 const modalCloseButton = document.getElementById('jsModalClose')
 const modalOverlay = document.querySelector('.modal-overlay')
+const modalContainer = document.querySelector('.modal')
 const selectElement = document.getElementById('selectable-options')
 
 const closeModal = _ => {
   document.body.classList.remove('modal-is-open')
-  modalOverlay.setAttribute('aria-modal', 'false')
-  modalIsOpen = false
+  modalContainer.setAttribute('aria-modal', 'false')
   modalButton.focus()
   ariaAnnouncement.innerText = 'Closing modal'
 }
 
 const openModal = _ => {
-  modalIsOpen = true
   document.body.classList.add('modal-is-open')
-  modalOverlay.setAttribute('aria-modal', 'true')
+  modalContainer.setAttribute('aria-modal', 'true')
   modalCloseButton.focus()
 }
 
