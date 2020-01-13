@@ -1,34 +1,37 @@
-var modalIsOpen = false
-const ariaAnnouncement = document.getElementById('event-announcement')
 const modalButton = document.getElementById('jsModalButton')
 const modalCloseButton = document.getElementById('jsModalClose')
 const modalOverlay = document.querySelector('.modal-overlay')
 const modalContainer = document.querySelector('.modal')
 const selectElement = document.getElementById('selectable-options')
 var aria = {}
-var aria.Utils = {}
+aria.Utils = {}
 aria.Utils.ignoreUtilFocusChanges = false
-aria.Utils.focusFirstDescendant = (element) => {
+aria.Utils.focusFirstDescendant = function(element) {
   for(i = 0; i < element.childNodes.length; i++) {
     var child = element.childNodes[i]
-    if(aria.Utils.attemptFocus(child)) {
+    if(aria.Utils.attemptFocus(child) ||
+     aria.Utils.focusFirstDescendant(child)) {
       return true
     }  // End if attemptFocus
   }  // End children loop
   return false
 }  // End aria.Utils.focusFirstDescendant function
-aria.Utils.focusLastDescendant = (element) => {
+aria.Utils.focusLastDescendant = function(element) {
+  console.log('Number of children: ' + element.childNodes.length)
   for(i = element.childNodes.length - 1; i > 0; i--) {
     var child = element.childNodes[i]
-    if(aria.Utils.attemptFocus(child)) {
+    if(aria.Utils.attemptFocus(child) ||
+     aria.Utils.focusLastDescendant(child)) {
       return true
     }  // End if attemptFocus
   }  // End children loop
+  console.log('No focusable element found.')
   return false
 }  // End aria.Utils.focusLastDescendant function
-aria.Utils.attemptFocus = (element) => {
+aria.Utils.attemptFocus = function(element) {
   aria.Utils.ignoreUtilFocusChanges = true
   try {
+    console.log(element)
     element.focus()
   }
   catch(e) {
@@ -87,32 +90,36 @@ aria.Dialog = function(dialogId, focusAfterClosed, focusFirst) {
   this.addListeners()
   aria.OpenDialogList.push(this)
   document.body.classList.add('modal-is-open')
+  this.dialogNode.className = 'modal'
   if(this.focusFirst) {
     this.focusFirst.focus()
   }  // End if focusFirst has a value
   else {
-    aria.Utils.focusFirstDescendant(this)
-  }  // Else focus the the first focusable descendant
+    aria.Utils.focusFirstDescendant(this.dialogNode)
+  }  // Else focus the first focusable descendant
   this.lastFocus = document.activeElement
 }  // End Dialog constructor
-aria.Dialog.prototype.close = _ => {
+aria.Dialog.prototype.close = function() {
   aria.OpenDialogList.pop()
   this.removeListeners()
-  aria.Utils.remove(this.preNode)
-  aria.Utils.remove(this.postNode)
+  //aria.Utils.remove(this.preNode)
+  //aria.Utils.remove(this.postNode)
+  this.preNode.remove()
+  this.postNode.remove()
+  this.dialogNode.className = 'hidden'
   document.body.classList.remove('modal-is-open')
   this.focusAfterClosed.focus()
   if(aria.OpenDialogList.length > 0) {
     aria.getCurrentDialog()
   }  // End if there are open dialogs
 }  // End Dialog.close function
-aria.Dialog.prototype.addListeners = _ => {
+aria.Dialog.prototype.addListeners = function() {
   document.addEventListener('focus', this.trapFocus, true)
 }  // End addListeners method
-aria.Dialog.prototype.removeListeners = _ => {
+aria.Dialog.prototype.removeListeners = function() {
   document.removeEventListener('focus', this.trapFocus, true)
 }  // End removeListeners method
-aria.Utils.prototype.trapFocus = (event) {
+aria.Dialog.prototype.trapFocus = function(event) {
   if(aria.Utils.ignoreUtilFocusChanges) {
     return
   }  // End if ignoreUtilFocusChanges
@@ -131,6 +138,12 @@ aria.Utils.prototype.trapFocus = (event) {
 window.openDialog = function(dialogId, focusAfterClosed, focusFirst) {
   var dialog = new this.aria.Dialog(dialogId, focusAfterClosed, focusFirst)
 }  // End openDialog method
+window.closeDialog = function(closeButton) {
+  var currentDialog = aria.getCurrentDialog()
+  if(currentDialog.dialogNode.contains(closeButton)) {
+    currentDialog.close()
+  }  // End if the passed in button is in the dialog
+}  // End closeDialog method
 
 const closeModal = _ => {
   document.body.classList.remove('modal-is-open')

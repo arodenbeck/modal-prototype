@@ -21,21 +21,21 @@
       <h1>Modal Practice</h1>
       <span aria-live="polite" id="event-announcement"></span>
       <div class="wrap">
-        <button class="button jsModalButton" id="jsModalButton"onclick="openDialog('modal-dialog', this,)"  >Click me!</button>
+        <button class="button jsModalButton" id="jsModalButton" onclick="openDialog('modal-dialog', this, 'jsModalClose')" >Click me!</button>
       </div>
     </main>
 
 
     <div class="modal-overlay jsModalOverlay" >
-      <div class="modal" role="dialog" aria-labeledby="modal-title" aria-describedby="modal-desc" aria-modal="true" id="modal-dialog" >
+      <div class="hidden" id="modal-dialog" role="dialog" aria-labeledby="modal-title" aria-describedby="modal-desc" aria-modal="true" >
+        <button class="jsModalClose" id="jsModalClose" onclick="closeDialog(this)">Close modal</button>
         <h2 id="modal-title">Inside the modal</h2>
         <div class="modal__content">
           <div class="modal-content__left">
             <p id="modal-desc">This is a screen reader test.</p>
           </div>
 
-          <div>
-            <button class="jsModalClose" id="jsModalClose" onclick="closeDialog(this)">Close modal</button>
+          <div class="modal-content__right">
             <label for="selectable-options">Selectable options</label>
             <select id="selectable-options">
               <option>One</option>
